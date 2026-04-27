@@ -1,7 +1,7 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
-var nome = "Seu Nome"
-let sobrenome = "Seu Sobrenome"
+var nome = "Arthur"
+let sobrenome = "Millen"
 
 print("Bem-vindo(a), \(nome) \(sobrenome)!")
