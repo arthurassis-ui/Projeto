@@ -1,5 +1,4 @@
 import Foundation
-
 enum NivelExperiencia: String {
     case iniciante = "Iniciante"
     case intermediario = "Intermediário"
@@ -196,3 +195,181 @@ print(aluno.informacoesParaAluno())
 print("----- TESTE MUDAR PLANOS -----")
 aluno.atualizarPlano(novoPlano: CatalogoPlanos.planoExperimental)
 aluno.atualizarPlano(novoPlano: CatalogoPlanos.planoSucoMensal)
+
+
+
+
+
+// Segunda Tarefa Dia 2
+
+
+import Foundation
+enum NivelExperiencia: String {
+    case iniciante = "Iniciante"
+    case intermediario = "Intermediário"
+    case avancado = "Avançado"
+}
+enum CategoriaAula: String {
+    case musculacao = "Musculação"
+    case spinning = "Spinning"
+    case yoga = "Yoga"
+    case funcional = "Funcional"
+    case luta = "Luta"
+    case pilates = "Pilates"
+}
+enum TipoPlano {
+    case normal
+    case experimental
+}
+struct Horario: Equatable {
+    let hora: String
+}
+class Plano {
+    let nome: String
+    let valorMensalidade: Double
+    let incluiPersonal: Bool
+    let limiteAulasColetivas: Int
+    let duracaoMeses: Int
+    let tipo: TipoPlano
+    
+    init(nome: String, valorMensalidade: Double, incluiPersonal: Bool, limiteAulasColetivas: Int, duracaoMeses: Int, tipo: TipoPlano) {
+        self.nome = nome
+        self.valorMensalidade = valorMensalidade
+        self.incluiPersonal = incluiPersonal
+        self.limiteAulasColetivas = limiteAulasColetivas
+        self.duracaoMeses = duracaoMeses
+        self.tipo = tipo
+    }
+}
+class CatalogoPlanos {
+    static let planoFitTrimestral = Plano(nome: "Plano Fit Trimestral", valorMensalidade: 130.0, incluiPersonal: true, limiteAulasColetivas: 30, duracaoMeses: 3, tipo: .normal)
+    
+    static let planoSucoMensal = Plano(nome: "Plano Suco Mensal", valorMensalidade: 150.0, incluiPersonal: false, limiteAulasColetivas: 10, duracaoMeses: 1, tipo: .normal)
+    
+    static let planoEconomicoAnual = Plano(nome: "Plano Econômico Anual", valorMensalidade: 90.0, incluiPersonal: true, limiteAulasColetivas: 40, duracaoMeses: 12, tipo: .normal)
+    
+    static let planoExperimental = Plano(nome: "Plano Experimental", valorMensalidade: 0.0, incluiPersonal: true, limiteAulasColetivas: 5, duracaoMeses: 0, tipo: .experimental)
+}
+class Pessoa {
+    let nome: String
+    let email: String
+    let funcao: String
+    
+    init(nome: String, email: String, funcao: String) {
+        self.nome = nome
+        self.email = email
+        self.funcao = funcao
+    }
+}
+class Aluno: Pessoa {
+    let matricula: Int
+    let cpf: String
+    private var plano: Plano
+    private var nivel: NivelExperiencia
+    private static var cpfsQueUsaramExperimental: Set<String> = []
+    init(nome: String, email: String, matricula: Int, cpf: String, plano: Plano, nivel: NivelExperiencia) {
+        self.matricula = matricula
+        self.cpf = cpf
+        self.nivel = nivel
+        if plano.tipo == .experimental {
+            if Aluno.cpfsQueUsaramExperimental.contains(cpf) {
+                self.plano = CatalogoPlanos.planoSucoMensal
+            } else {
+                Aluno.cpfsQueUsaramExperimental.insert(cpf)
+                self.plano = plano
+            }
+        } else {
+            self.plano = plano
+        }
+        
+        super.init(nome: nome, email: email, funcao: "Aluno")
+    }
+}
+class Instrutor: Pessoa {
+    let especialidade: CategoriaAula
+    let horario: Horario
+    
+    init(nome: String, email: String, especialidade: CategoriaAula, horario: Horario) {
+        self.especialidade = especialidade
+        self.horario = horario
+        super.init(nome: nome, email: email, funcao: "Instrutor")
+    }
+}
+protocol Aula {
+    var nome: String { get }
+    var instrutor: Instrutor { get }
+    var categoria: CategoriaAula { get }
+    var descricao: String { get }
+}
+class TurmaColetiva: Aula {
+    let nome: String
+    let instrutor: Instrutor
+    let categoria: CategoriaAula
+    let descricao: String
+    let capacidadeMin: Int
+    let capacidadeMax: Int
+    private(set) var alunos: [Aluno] = []
+    init(nome: String, instrutor: Instrutor, categoria: CategoriaAula, descricao: String, capacidadeMin: Int, capacidadeMax: Int) {
+        self.nome = nome
+        self.instrutor = instrutor
+        self.categoria = categoria
+        self.descricao = descricao
+        self.capacidadeMin = capacidadeMin
+        self.capacidadeMax = capacidadeMax
+    }
+    func inscrever(aluno: Aluno) -> Bool {
+        if alunos.contains(where: { $0.matricula == aluno.matricula }) {
+            print("Aluno já está inscrito")
+            return false
+        }
+        if alunos.count >= capacidadeMax {
+            print("Turma cheia")
+            return false
+        }
+        alunos.append(aluno)
+        print("Aluno inscrito com sucesso")
+        return true
+    }
+    func turmaValida() -> Bool {
+        return alunos.count >= capacidadeMin
+    }
+}
+class TreinoPersonal: Aula {
+    let nome: String
+    let instrutor: Instrutor
+    let categoria: CategoriaAula
+    let descricao: String
+    let aluno: Aluno
+    let horario: Horario
+    init(nome: String, instrutor: Instrutor, categoria: CategoriaAula, descricao: String, aluno: Aluno, horario: Horario) {
+        self.nome = nome
+        self.instrutor = instrutor
+        self.categoria = categoria
+        self.descricao = descricao
+        self.aluno = aluno
+        self.horario = horario
+    }
+}
+let h1 = Horario(hora: "06:00")
+let instrutor = Instrutor(nome: "Carlos", email: "c@.com", especialidade: .musculacao, horario: h1)
+let aluno = Aluno(nome: "Arthur", email: "arthur@email.com", matricula: 123, cpf: "12345678900", plano: CatalogoPlanos.planoExperimental, nivel: .iniciante)
+let turma = TurmaColetiva(
+    nome: "Funcional",
+    instrutor: instrutor,
+    categoria: .funcional,
+    descricao: "Treino em grupo",
+    capacidadeMin: 2,
+    capacidadeMax: 3
+)
+turma.inscrever(aluno: aluno)
+turma.inscrever(aluno: aluno)
+print("Turma válida? \(turma.turmaValida())")
+let personal = TreinoPersonal(
+    nome: "Personal",
+    instrutor: instrutor,
+    categoria: .musculacao,
+    descricao: "Treino individual",
+    aluno: aluno,
+    horario: h1
+)
+print("Treino personal com \(personal.instrutor.nome) para \(personal.aluno.nome)")
