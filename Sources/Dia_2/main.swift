@@ -1,6 +1,4 @@
 import Foundation
-import Foundation
-
 protocol Manutencao {
     var nomeMaquina: String { get }
     var id: String { get }
