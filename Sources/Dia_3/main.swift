@@ -292,18 +292,73 @@ class SistemaAcademia {
         }
         alunos[aluno.matricula] = aluno
         emails[aluno.email] = aluno
+        print("O aluno \(aluno.nome) foi matriculado!")
+    }
+    func removerAluno(matricula: Int) {
+        if let aluno = alunos.removeValue(forKey: matricula) {
+            print("O aluno da matricula \(aluno.matricula) foi removido!")
+            emails.removeValue(forKey: aluno.email)
+        } else{
+            print("Erro: matricula \(matricula) não encontrada")
+        }
     }
     
     func adicionarInstrutor(_ instrutor: Instrutor) {
         instrutores[instrutor.email] = instrutor
+        print("O instrutor \(instrutor.nome) foi adicionado!")
+        
     }
     
+    func removerInstrutor(email: String) {
+        if let instrutor = instrutores.removeValue(forKey: email) {
+            print("O instrutor \(instrutor.nome) foi removido")
+        } else {
+            print("Erro: \(email) não encontrado")
+        }
+    }
+    
+    func atualizarInstrutor(email: String, novoInstrutor: Instrutor) {
+        if instrutores[email] != nil {
+            instrutores[email] = novoInstrutor
+            print("Os instrutores foram atualizados")
+        } else {
+            print("erro ao atualizar instrutores")
+        }
+    }
+    
+    func alunosComPersonal() {
+        var contador = 1
+        for aula in aulas.values {
+            if let personal = aula as? TreinoPersonal {
+                print("\(contador)- O aluno \(personal.aluno.nome) está sendo instruído pelo instrutor \(personal.instrutor.nome).")
+                contador += 1
+            }
+        }
+    }
+
     func adicionarEquipamento(_ equipamento: EquipamentoAcademia) {
         equipamentos[equipamento.id] = equipamento
+        print("O equipamento \(equipamento.nomeMaquina) foi adicionado!")
     }
     
+    func removerEquipamento(id: String) {
+        if let equipamento = equipamentos.removeValue(forKey: id) {
+            print("O equipamento \(equipamento.nomeMaquina) foi removido")
+        } else {
+            print("Equipamento do ID \(id) não encontrado")
+        }
+    }
     func adicionarAula(_ aula: Aula) {
         aulas[aula.nome] = aula
+        print("A aula de \(aula.nome) foi adicionada!")
+    }
+    
+    func removerAula(nome: String) {
+        if let aula = aulas.removeValue(forKey: nome) {
+            print("A aula \(aula.nome) foi removida")
+        } else {
+            print("Erro: aula \(nome) não encontrada")
+        }
     }
     
     func manutencaoEmLote(data: String, problema: TipoProblema) {
@@ -322,6 +377,26 @@ class SistemaAcademia {
         }
     }
     func agendarPersonal(nomeAula: String, instrutor: Instrutor, aluno: Aluno, horario: Horario) {
+
+    if alunos[aluno.matricula] == nil {
+        print("Aluno não cadastrado")
+        return
+    }
+
+    if instrutores[instrutor.email] == nil {
+        print("Instrutor não cadastrado")
+        return
+    }
+
+    for aula in aulas.values {
+        if let personal = aula as? TreinoPersonal {
+            if personal.instrutor.email == instrutor.email && personal.horario == horario {
+                print("Instrutor já possui personal nesse horário")
+                return
+            }
+        }
+    }
+
     if aluno.podeAgendarPersonal() {
         let aula = TreinoPersonal(
             nome: nomeAula,
@@ -337,6 +412,13 @@ class SistemaAcademia {
         print("Plano não permite personal")
     }
 }
+    func resumoSistema() {
+        print("Resumo geral do sistema:")
+        print("Total de alunos cadastrados: \(alunos.count)")
+        print("Total de instrutores cadastrados: \(instrutores.count)")
+        print("Total de equipamentos cadastrados: \(equipamentos.count)")
+        print("Total de aulas cadastradas: \(aulas.count)")
+    }
 }
 
 let academia = Academia()
@@ -345,21 +427,21 @@ let h1 = Horario(hora: "06:00")
 let h2 = Horario(hora: "11:00")
 let h3 = Horario(hora: "22:00")
 
-academia.adicionarInstrutor(Instrutor(nome: "Carlos", email: "c@.com", especialidade: .musculacao, horario: h1))
-academia.adicionarInstrutor(Instrutor(nome: "Bruno", email: "b@.com", especialidade: .musculacao, horario: h2))
-academia.adicionarInstrutor(Instrutor(nome: "Rafael", email: "r@.com", especialidade: .musculacao, horario: h3))
+academia.adicionarInstrutor(Instrutor(nome: "Carlos", email: "carlos@.com", especialidade: .musculacao, horario: h1))
+academia.adicionarInstrutor(Instrutor(nome: "Bruno", email: "bruno@.com", especialidade: .musculacao, horario: h2))
+academia.adicionarInstrutor(Instrutor(nome: "Rafael", email: "rafael@.com", especialidade: .musculacao, horario: h3))
 
-academia.adicionarInstrutor(Instrutor(nome: "Ana", email: "a@.com", especialidade: .pilates, horario: h1))
-academia.adicionarInstrutor(Instrutor(nome: "Julia", email: "j@.com", especialidade: .pilates, horario: h2))
-academia.adicionarInstrutor(Instrutor(nome: "Marcos", email: "m@.com", especialidade: .pilates, horario: h3))
+academia.adicionarInstrutor(Instrutor(nome: "Ana", email: "ana@.com", especialidade: .pilates, horario: h1))
+academia.adicionarInstrutor(Instrutor(nome: "Julia", email: "julia@.com", especialidade: .pilates, horario: h2))
+academia.adicionarInstrutor(Instrutor(nome: "Marcos", email: "marcos@.com", especialidade: .pilates, horario: h3))
 
-academia.adicionarInstrutor(Instrutor(nome: "Leo", email: "l@.com", especialidade: .yoga, horario: h1))
-academia.adicionarInstrutor(Instrutor(nome: "Clara", email: "c@.com", especialidade: .yoga, horario: h2))
-academia.adicionarInstrutor(Instrutor(nome: "Paulo", email: "p@.com", especialidade: .yoga, horario: h3))
+academia.adicionarInstrutor(Instrutor(nome: "Leo", email: "leo@.com", especialidade: .yoga, horario: h1))
+academia.adicionarInstrutor(Instrutor(nome: "Clara", email: "clara@.com", especialidade: .yoga, horario: h2))
+academia.adicionarInstrutor(Instrutor(nome: "Paulo", email: "paulo@.com", especialidade: .yoga, horario: h3))
 
-academia.adicionarInstrutor(Instrutor(nome: "Diego", email: "d@.com", especialidade: .spinning, horario: h1))
-academia.adicionarInstrutor(Instrutor(nome: "Fernanda", email: "f@.com", especialidade: .spinning, horario: h2))
-academia.adicionarInstrutor(Instrutor(nome: "Gustavo", email: "g@.com", especialidade: .spinning, horario: h3))
+academia.adicionarInstrutor(Instrutor(nome: "Diego", email: "diego@.com", especialidade: .spinning, horario: h1))
+academia.adicionarInstrutor(Instrutor(nome: "Fernanda", email: "fernanda@.com", especialidade: .spinning, horario: h2))
+academia.adicionarInstrutor(Instrutor(nome: "Gustavo", email: "gustavo@.com", especialidade: .spinning, horario: h3))
 
 academia.adicionarInstrutor(Instrutor(nome: "Pedro", email: "p@.com", especialidade: .funcional, horario: h1))
 academia.adicionarInstrutor(Instrutor(nome: "Larissa", email: "l@.com", especialidade: .funcional, horario: h2))
@@ -382,7 +464,7 @@ print(aluno.informacoesParaAluno())
 
 print("----- TESTE MUDAR PLANOS -----")
 aluno.atualizarPlano(novoPlano: CatalogoPlanos.planoExperimental)
-aluno.atualizarPlano(novoPlano: CatalogoPlanos.planoSucoMensal)
+aluno.atualizarPlano(novoPlano: CatalogoPlanos.planoEconomicoAnual)
 
 print("========== TESTE MANUTENÇÃO ==========")
 let eq1 = EquipamentoAcademia(nomeMaquina: "Supino", id: "EQ001", tipo: .peito, estado: .funcionando)
@@ -449,3 +531,29 @@ sistema.agendarPersonal(
     aluno: aluno,
     horario: h1
 )
+
+print("----- TESTE ATUALIZAR INSTRUTOR -----")
+let novoInstrutor = Instrutor(nome: "Carlos Da Silva", email: "carlos@.com", especialidade: .musculacao, horario: h2)
+sistema.atualizarInstrutor(email: "carlos@.com", novoInstrutor: novoInstrutor)
+
+print("----- TESTE REMOVER EQUIPAMENTO -----")
+sistema.removerEquipamento(id: "EQ001")
+sistema.removerEquipamento(id: "EQ999")
+
+print("----- TESTE ALUNOS COM PERSONAL -----")
+sistema.alunosComPersonal()
+
+print("----- TESTE RESUMO DO SISTEMA -----")
+sistema.resumoSistema()
+
+print("----- TESTE REMOVER AULA -----")
+sistema.removerAula(nome: "Personal 1")
+sistema.removerAula(nome: "Personal")
+
+print("----- TESTE REMOVER INSTRUTOR -----")
+sistema.removerInstrutor(email: "marcos@.com")
+sistema.removerInstrutor(email: "marcia@.com")
+
+print("----- TESTE REMOVER ALUNO -----")
+sistema.removerAluno(matricula: 123)
+sistema.removerAluno(matricula: 321)
